@@ -2,10 +2,25 @@
 import type { HiraganaUnit } from "@/data/hiragana-curriculum";
 import type { PracticeItem } from "@/lib/practice/types";
 import { ProgressRepository, PROGRESS_EVENT, selectLearningSnapshot } from "@/lib/progress/repository";
-import type { CharacterLearningStatus, PracticeExercise, ProgressState } from "@/lib/progress/types";
+import type { CharacterLearningStatus, PracticeExercise, ProgressState, StorageAdapter } from "@/lib/progress/types";
 
 let repository: ProgressRepository | null = null;
-export function getProgressRepository() { if (typeof window === "undefined") return null; repository ??= new ProgressRepository(window.localStorage); return repository; }
+const memoryValues = new Map<string, string>();
+const memoryStorage: StorageAdapter = {
+  getItem: (key) => memoryValues.get(key) ?? null,
+  setItem: (key, value) => memoryValues.set(key, value),
+  removeItem: (key) => memoryValues.delete(key),
+};
+
+function getBrowserStorage(): StorageAdapter {
+  try {
+    return window.localStorage ?? memoryStorage;
+  } catch {
+    return memoryStorage;
+  }
+}
+
+export function getProgressRepository() { if (typeof window === "undefined") return null; repository ??= new ProgressRepository(getBrowserStorage()); return repository; }
 function notify() { window.dispatchEvent(new Event(PROGRESS_EVENT)); }
 export function loadProgress(): ProgressState | null { return getProgressRepository()?.loadProgress() ?? null; }
 export function updateCharacterProgress(item: PracticeItem, exercise: PracticeExercise, correct: boolean) { const result = getProgressRepository()?.updateCharacterProgress(item.id, { kind: exercise, correct }); if (result) notify(); return result; }

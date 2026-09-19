@@ -4,14 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
 import { hiraganaCurriculum } from "@/data/hiragana-curriculum";
+import { hiraganaCharacters } from "@/data/hiragana";
 import { useLearningSnapshot } from "@/hooks/use-learning-snapshot";
+import { selectProgressiveCharacters } from "@/lib/practice/selection";
 
 export function DashboardContent() {
   const snapshot = useLearningSnapshot();
   const currentUnit = hiraganaCurriculum.find((unit) => unit.id === (snapshot?.currentUnitId ?? 1)) ?? hiraganaCurriculum[0];
   const learned = snapshot?.learnedIds.length ?? 0;
-  const reviewPool = snapshot ? (snapshot.reviewIds.length ? snapshot.reviewIds : snapshot.learnedIds.length ? snapshot.learnedIds : snapshot.introducedIds) : [];
-  const reviewCount = Math.min(10, reviewPool.length);
+  const reviewCount = snapshot ? selectProgressiveCharacters(snapshot, hiraganaCharacters).length : 0;
 
   return <div className="pb-7 pt-2 sm:pt-6 lg:pt-8">
     <header className="mb-5 max-w-2xl sm:mb-7">
@@ -37,7 +38,7 @@ export function DashboardContent() {
       </div>
     </section>
 
-    <Link href={reviewCount ? "/practice?review=1" : `/hiragana/unit/${currentUnit.id}`} className="relative mt-4 flex min-h-[5.25rem] items-center justify-between overflow-hidden rounded-[1.4rem] bg-[var(--nazumo-purple)] px-5 text-white transition active:scale-[.99]"><span className="relative z-10 max-w-48 text-xl font-extrabold leading-tight tracking-[-.035em]">{reviewCount ? `${reviewCount} caracteres te esperan.` : "Pequeños trazos, grandes logros."}</span><span className="relative z-10 flex size-11 items-center justify-center rounded-full bg-white/20"><Icon name="arrow" className="size-5" /></span><span className="absolute -bottom-8 right-16 size-20 rounded-full border-[9px] border-[var(--nazumo-lime)] opacity-80" /></Link>
+    <Link href={reviewCount ? "/practice" : `/hiragana/unit/${currentUnit.id}`} className="relative mt-4 flex min-h-[5.25rem] items-center justify-between overflow-hidden rounded-[1.4rem] bg-[var(--nazumo-purple)] px-5 text-white transition active:scale-[.99]"><span className="relative z-10 max-w-48 text-xl font-extrabold leading-tight tracking-[-.035em]">{reviewCount ? `${reviewCount} caracteres te esperan.` : "Pequeños trazos, grandes logros."}</span><span className="relative z-10 flex size-11 items-center justify-center rounded-full bg-white/20"><Icon name="arrow" className="size-5" /></span><span className="absolute -bottom-8 right-16 size-20 rounded-full border-[9px] border-[var(--nazumo-lime)] opacity-80" /></Link>
   </div>;
 }
 
