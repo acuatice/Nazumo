@@ -44,7 +44,7 @@ export function DashboardContent() {
 
 function CharacterCover({ href, title, subtitle, tone, image, imagePosition = "center" }: { href?: string; title: string; subtitle: string; tone: "pink" | "lavender" | "cream"; image: string; imagePosition?: string }) {
   const tones = { pink: "bg-[var(--nazumo-pink)]", lavender: "bg-[var(--nazumo-lavender)]", cream: "bg-white" };
-  const content = <><div className="relative h-[5.35rem] overflow-hidden rounded-[1rem] bg-white/35 min-[375px]:h-[6.3rem]"><Image src={image} alt="" fill sizes="33vw" className="object-cover" style={{ objectPosition: imagePosition }} /></div><div className="mt-2"><h3 className="text-xs font-extrabold min-[375px]:text-sm">{title}</h3><p className="mt-0.5 truncate text-[10px] leading-tight text-[var(--muted)] min-[375px]:text-[11px]">{subtitle}</p></div></>;
+  const content = <><div className="relative h-[5.35rem] overflow-hidden rounded-[1rem] bg-white/35 min-[375px]:h-[6.3rem]"><Image src={image} alt="" fill loading="eager" sizes="33vw" className="object-cover" style={{ objectPosition: imagePosition }} /></div><div className="mt-2"><h3 className="text-xs font-extrabold min-[375px]:text-sm">{title}</h3><p className="mt-0.5 truncate text-[10px] leading-tight text-[var(--muted)] min-[375px]:text-[11px]">{subtitle}</p></div></>;
   const classes = `min-w-0 rounded-[1.25rem] p-2.5 transition ${tones[tone]} ${href ? "active:scale-[.98]" : "opacity-90"}`;
   return href ? <Link href={href} className={classes}>{content}</Link> : <article className={classes}>{content}</article>;
 }
