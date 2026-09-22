@@ -9,14 +9,14 @@ interface RecognitionOptionsProps {
 
 export function RecognitionOptions({ options, feedback, onSelect }: RecognitionOptionsProps) {
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {options.map((option) => {
+    <div key={options.join(":")} className="grid grid-cols-2 gap-3">
+      {options.map((option, index) => {
         const isCorrect = feedback?.correctAnswer === option;
         const isSelectedWrong = feedback && !feedback.isCorrect && feedback.selectedAnswer === option;
         const state: ExerciseOptionState = isCorrect ? "correct" : isSelectedWrong ? "incorrect" : feedback ? "disabled" : "idle";
 
         return (
-          <ExerciseOption key={option} state={state} onClick={() => onSelect(option)} disabled={Boolean(feedback)}>
+          <ExerciseOption key={option} state={state} style={{ animationDelay: `${index * 55}ms` }} onClick={() => onSelect(option)} disabled={Boolean(feedback)}>
             {option}
           </ExerciseOption>
         );

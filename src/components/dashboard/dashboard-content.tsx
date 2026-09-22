@@ -8,6 +8,7 @@ import { hiraganaCharacters } from "@/data/hiragana";
 import { useLearningSnapshot } from "@/hooks/use-learning-snapshot";
 import { selectProgressiveCharacters } from "@/lib/practice/selection";
 import { useLearnerProfile } from "@/components/account/profile-store";
+import { LearningOnboarding } from "@/components/onboarding/learning-onboarding";
 
 export function DashboardContent() {
   const snapshot = useLearningSnapshot();
@@ -20,6 +21,7 @@ export function DashboardContent() {
     <header className="mb-5 max-w-2xl sm:mb-7">
       <p className="text-base font-medium">¡Hola{profile ? `, ${profile.name}` : ""}!</p>
       <h1 className="mt-1 max-w-[20rem] text-[2rem] font-extrabold leading-[1.08] tracking-[-.055em] min-[375px]:text-[2.25rem] sm:max-w-2xl sm:text-5xl">Hoy es un buen día para aprender japonés.</h1>
+      <LearningOnboarding />
     </header>
 
     <section className="relative min-h-[15.5rem] overflow-hidden rounded-[1.8rem] bg-[var(--nazumo-lavender)] shadow-[0_16px_45px_rgba(63,31,128,.09)] min-[375px]:min-h-[16.5rem] sm:min-h-[20rem]">

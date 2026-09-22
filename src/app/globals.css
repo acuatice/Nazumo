@@ -84,8 +84,61 @@ input, textarea, select { font-size: max(16px, 1em); }
 }
 
 @keyframes kaku-pop {
-  0% { transform: scale(.96); opacity: .65; }
-  100% { transform: scale(1); opacity: 1; }
+  0% { transform: scale(.78) rotate(-5deg); opacity: .2; }
+  70% { transform: scale(1.06) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes option-in {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes answer-correct {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.045) rotate(-1deg); }
+  100% { transform: scale(1); }
+}
+
+@keyframes answer-incorrect {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes feedback-pop {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes onboarding-enter {
+  from { opacity: 0; transform: translateY(12px) scale(.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes onboarding-orbit {
+  from { transform: rotate(0) translateX(74px) rotate(0); }
+  to { transform: rotate(360deg) translateX(74px) rotate(-360deg); }
+}
+
+.answer-option-in { animation: option-in .34s cubic-bezier(.2,.7,.2,1) both; }
+.answer-correct { animation: answer-correct .38s cubic-bezier(.2,.7,.2,1); }
+.answer-incorrect { animation: answer-incorrect .26s ease-in-out; }
+.feedback-pop { animation: feedback-pop .2s cubic-bezier(.2,.7,.2,1) both; }
+.onboarding-overlay { animation: feedback-pop .22s ease-out both; }
+.onboarding-card { animation: onboarding-enter .4s cubic-bezier(.2,.7,.2,1) both; }
+.onboarding-art { position: relative; isolation: isolate; }
+.onboarding-orbit { position: absolute; width: .55rem; height: .55rem; border-radius: 999px; background: white; opacity: .85; }
+.onboarding-orbit-one { animation: onboarding-orbit 7s linear infinite; }
+.onboarding-orbit-two { width: .35rem; height: .35rem; opacity: .65; animation: onboarding-orbit 10s linear infinite reverse; }
+.onboarding-kana { animation: kaku-pop .55s cubic-bezier(.2,.7,.2,1) both; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-page-in > section, .animate-page-in > a, .animate-page-in > header {
+    animation: card-in .46s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .animate-page-in > section:nth-of-type(2) { animation-delay: 70ms; }
+  .animate-page-in > section:nth-of-type(3) { animation-delay: 130ms; }
 }
 
 @keyframes stroke-order {
@@ -104,5 +157,6 @@ input, textarea, select { font-size: max(16px, 1em); }
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
