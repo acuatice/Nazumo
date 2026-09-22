@@ -7,16 +7,18 @@ import { hiraganaCurriculum } from "@/data/hiragana-curriculum";
 import { hiraganaCharacters } from "@/data/hiragana";
 import { useLearningSnapshot } from "@/hooks/use-learning-snapshot";
 import { selectProgressiveCharacters } from "@/lib/practice/selection";
+import { useLearnerProfile } from "@/components/account/profile-store";
 
 export function DashboardContent() {
   const snapshot = useLearningSnapshot();
+  const profile = useLearnerProfile();
   const currentUnit = hiraganaCurriculum.find((unit) => unit.id === (snapshot?.currentUnitId ?? 1)) ?? hiraganaCurriculum[0];
   const learned = snapshot?.learnedIds.length ?? 0;
   const reviewCount = snapshot ? selectProgressiveCharacters(snapshot, hiraganaCharacters).length : 0;
 
-  return <div className="pb-7 pt-2 sm:pt-6 lg:pt-8">
+  return <div className="pb-7 pt-2 sm:pt-6 lg:pt-8 animate-page-in">
     <header className="mb-5 max-w-2xl sm:mb-7">
-      <p className="text-base font-medium">¡Hola!</p>
+      <p className="text-base font-medium">¡Hola{profile ? `, ${profile.name}` : ""}!</p>
       <h1 className="mt-1 max-w-[20rem] text-[2rem] font-extrabold leading-[1.08] tracking-[-.055em] min-[375px]:text-[2.25rem] sm:max-w-2xl sm:text-5xl">Hoy es un buen día para aprender japonés.</h1>
     </header>
 
@@ -39,6 +41,10 @@ export function DashboardContent() {
     </section>
 
     <Link href={reviewCount ? "/practice" : `/hiragana/unit/${currentUnit.id}`} className="relative mt-4 flex min-h-[5.25rem] items-center justify-between overflow-hidden rounded-[1.4rem] bg-[var(--nazumo-purple)] px-5 text-white transition active:scale-[.99]"><span className="relative z-10 max-w-48 text-xl font-extrabold leading-tight tracking-[-.035em]">{reviewCount ? `${reviewCount} caracteres te esperan.` : "Pequeños trazos, grandes logros."}</span><span className="relative z-10 flex size-11 items-center justify-center rounded-full bg-white/20"><Icon name="arrow" className="size-5" /></span><span className="absolute -bottom-8 right-16 size-20 rounded-full border-[9px] border-[var(--nazumo-lime)] opacity-80" /></Link>
+    <section className="mt-7 grid gap-3 sm:grid-cols-2">
+      <Link href="/vocabulario" className="group rounded-[1.55rem] bg-[var(--nazumo-cream)] p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-[.99] sm:p-6"><p className="text-xs font-bold uppercase tracking-[.12em] text-[var(--nazumo-purple)]">Nuevo · 12 palabras</p><h2 className="mt-2 text-xl font-extrabold tracking-[-.04em]">Vocabulario de cada día</h2><p className="mt-1 text-sm text-[var(--muted)]">Palabras y frases para leer en contexto.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-bold">Explorar <Icon name="arrow" className="size-4 transition-transform group-hover:translate-x-1" /></span></Link>
+      <Link href="/cuenta" className="group rounded-[1.55rem] bg-[var(--nazumo-lavender)]/65 p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-[.99] sm:p-6"><p className="text-xs font-bold uppercase tracking-[.12em] text-[var(--nazumo-purple)]">Tu espacio</p><h2 className="mt-2 text-xl font-extrabold tracking-[-.04em]">Guarda tu perfil</h2><p className="mt-1 text-sm text-[var(--muted)]">Personaliza tu bienvenida y consulta tu racha.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-bold">{profile ? "Ver perfil" : "Crear perfil"} <Icon name="arrow" className="size-4 transition-transform group-hover:translate-x-1" /></span></Link>
+    </section>
   </div>;
 }
 
