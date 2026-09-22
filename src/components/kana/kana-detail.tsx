@@ -28,12 +28,12 @@ export function KanaDetail({ kana, state, onClose }: KanaDetailProps) {
 
         <div className="py-10 text-center">
           <h2 id="kana-detail-title" className="font-japanese text-[8rem] font-normal leading-none tracking-[-0.08em]">{kana.character}</h2>
-          <p className="mt-5 text-lg font-extrabold tracking-[0.12em] text-[var(--kaku-purple)]">{kana.romaji}</p>
+          <p className="mt-5 text-lg font-extrabold tracking-[0.12em] text-[var(--nazumo-purple)]">{kana.romaji}</p>
         </div>
 
         {kana.example && (
           <div className="rounded-[var(--radius-button)] bg-[var(--rice)] p-5">
-            <p className="text-xs font-bold text-[var(--kaku-purple)]">Ejemplo</p>
+            <p className="text-xs font-bold text-[var(--nazumo-purple)]">Ejemplo</p>
             <div className="mt-4 flex items-end justify-between gap-6">
               <div>
                 <p className="font-japanese text-3xl leading-none">{kana.example}</p>

@@ -5,5 +5,5 @@ export function Card({ className = "", ...props }: HTMLAttributes<HTMLElement>) 
 }
 
 export function HeroCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-[var(--radius-hero)] bg-[var(--kaku-purple)] text-white ${className}`}>{children}</section>;
+  return <section className={`rounded-[var(--radius-hero)] bg-[var(--nazumo-purple)] text-white ${className}`}>{children}</section>;
 }

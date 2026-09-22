@@ -8,7 +8,6 @@
   --nazumo-pink: #ffc9df;
   --nazumo-cream: #faf8f2;
   --nazumo-ink: #1d1b2d;
-  --kaku-purple: var(--nazumo-purple);
   --electric-violet: #7350ee;
   --yuzu: var(--nazumo-lime);
   --sora: var(--nazumo-lavender);
@@ -22,7 +21,7 @@
   --foreground: var(--sumi);
   --muted: #69666f;
   --border: #e5e1ea;
-  --accent: var(--kaku-purple);
+  --accent: var(--nazumo-purple);
   --accent-soft: #eee8ff;
   --space-page: 1.25rem;
   --radius-control: 0.75rem;
@@ -35,7 +34,7 @@
 
 html {
   min-height: 100%;
-  background: var(--kaku-purple);
+  background: var(--nazumo-purple);
   scroll-padding-bottom: calc(8rem + env(safe-area-inset-bottom));
 }
 
@@ -83,7 +82,7 @@ input, textarea, select { font-size: max(16px, 1em); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes kaku-pop {
+@keyframes nazumo-pop {
   0% { transform: scale(.78) rotate(-5deg); opacity: .2; }
   70% { transform: scale(1.06) rotate(1deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); opacity: 1; }
@@ -131,7 +130,7 @@ input, textarea, select { font-size: max(16px, 1em); }
 .onboarding-orbit { position: absolute; width: .55rem; height: .55rem; border-radius: 999px; background: white; opacity: .85; }
 .onboarding-orbit-one { animation: onboarding-orbit 7s linear infinite; }
 .onboarding-orbit-two { width: .35rem; height: .35rem; opacity: .65; animation: onboarding-orbit 10s linear infinite reverse; }
-.onboarding-kana { animation: kaku-pop .55s cubic-bezier(.2,.7,.2,1) both; }
+.onboarding-kana { animation: nazumo-pop .55s cubic-bezier(.2,.7,.2,1) both; }
 
 @media (prefers-reduced-motion: no-preference) {
   .animate-page-in > section, .animate-page-in > a, .animate-page-in > header {

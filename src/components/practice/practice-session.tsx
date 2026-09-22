@@ -43,7 +43,7 @@ export function PracticeSession({ characters = hiraganaCharacters, sessionSize =
   if (practice.stage === "transition") {
     return (
       <section className="w-full max-w-2xl rounded-[var(--radius-hero)] bg-white p-7 text-center nazumo-shadow sm:p-12">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--kaku-purple)]">Reconocimiento completado</p>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--nazumo-purple)]">Reconocimiento completado</p>
         <div className="relative mx-auto my-7 h-36 w-52 overflow-hidden"><Image src="/brand/nazumo-character.png" alt="Personaje de Nazumo celebrando" fill sizes="208px" className="object-cover object-bottom mix-blend-multiply" /></div>
         <h1 className="mx-auto max-w-lg text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-4xl">¡Bien! Ahora vamos a recordarlos sin ayuda.</h1>
         <p className="mt-5 text-sm text-[var(--muted)]">Los mismos {practice.session.length} caracteres, en un orden nuevo.</p>
@@ -59,7 +59,7 @@ export function PracticeSession({ characters = hiraganaCharacters, sessionSize =
     const accuracy = totalAnswers === 0 ? 0 : Math.round((totalCorrect / totalAnswers) * 100);
     return (
       <section className="w-full max-w-2xl rounded-[var(--radius-hero)] bg-white p-7 text-center nazumo-shadow sm:p-12">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--kaku-purple)]">Sesión completada</p>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--nazumo-purple)]">Sesión completada</p>
         <h1 className="mt-5 text-4xl font-extrabold tracking-[-0.045em] sm:text-5xl">Buen trabajo.</h1>
         <div className="my-7 grid gap-3 text-left min-[375px]:grid-cols-2 sm:my-9">
           <div className="rounded-2xl bg-[var(--background)] p-5"><p className="text-sm text-[var(--muted)]">Reconocimiento</p><p className="mt-3 text-3xl font-medium tracking-[-0.04em]">{practice.recognitionScore} / {practice.session.length}</p></div>
@@ -89,14 +89,14 @@ export function PracticeSession({ characters = hiraganaCharacters, sessionSize =
       <header>
         <div className="flex items-center justify-between gap-4">
           <Link href="/" aria-label="Abandonar práctica" className="flex size-11 items-center justify-center rounded-full bg-[var(--background)] text-lg font-medium text-[var(--muted)] transition hover:text-[var(--sumi)] focus-visible:outline-2">×</Link>
-          <div className="text-right"><p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--kaku-purple)]">{isRecognition ? "Reconocer" : "Recordar"}</p><p className="mt-1 text-sm tabular-nums text-[var(--muted)]">{practice.currentIndex + 1} / {practice.phaseItems.length}</p></div>
+          <div className="text-right"><p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--nazumo-purple)]">{isRecognition ? "Reconocer" : "Recordar"}</p><p className="mt-1 text-sm tabular-nums text-[var(--muted)]">{practice.currentIndex + 1} / {practice.phaseItems.length}</p></div>
         </div>
         <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[var(--accent-soft)]" role="progressbar" aria-valuemin={0} aria-valuemax={practice.phaseItems.length} aria-valuenow={answeredQuestions} aria-label={`Progreso de la fase ${isRecognition ? "de reconocimiento" : "de escritura"}`}><div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300 ease-out" style={{ width: `${progress}%` }} /></div>
       </header>
 
       <div key={`${practice.stage}:${current.id}`} className="animate-[question-in_.18s_ease-out] py-8 text-center min-[375px]:py-10 sm:py-14">
         <p className="text-sm font-bold text-[var(--sumi)]">{isRecognition ? "¿Cuál es su rōmaji?" : "Escribe su rōmaji"}</p>
-        <div lang="ja" className="font-japanese mt-5 animate-[kaku-pop_.2s_ease-out] text-[8.5rem] font-medium leading-none tracking-[-0.08em] sm:text-[11rem]">{current.prompt}</div>
+        <div lang="ja" className="font-japanese mt-5 animate-[nazumo-pop_.2s_ease-out] text-[8.5rem] font-medium leading-none tracking-[-0.08em] sm:text-[11rem]">{current.prompt}</div>
       </div>
 
       {isRecognition ? (

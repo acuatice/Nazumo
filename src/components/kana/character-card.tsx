@@ -4,8 +4,8 @@ export type CharacterVisualState = "new" | "learning" | "mastered" | "review";
 
 const stateStyles: Record<CharacterVisualState, string> = {
   new: "bg-white text-[var(--sumi)]/25",
-  learning: "bg-[var(--accent-soft)] text-[var(--kaku-purple)]",
-  mastered: "bg-[var(--kaku-purple)] text-[var(--yuzu)]",
+  learning: "bg-[var(--accent-soft)] text-[var(--nazumo-purple)]",
+  mastered: "bg-[var(--nazumo-purple)] text-[var(--yuzu)]",
   review: "bg-[var(--momo)] text-[var(--sumi)]",
 };
 

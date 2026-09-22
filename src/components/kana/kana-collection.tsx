@@ -25,9 +25,9 @@ export function KanaCollection() {
   };
 
   return <>
-    <header className="mb-8"><p className="text-sm font-semibold text-[var(--kaku-purple)]">Colección de kana</p><h1 className="mt-2 text-4xl font-extrabold tracking-[-0.055em] sm:text-6xl">Hiragana</h1><div className="mt-7 flex items-center justify-between text-sm"><span><strong>{learned}</strong> de 46 aprendidos</span><span className="text-[var(--muted)]">{Math.round((learned / 46) * 100)}%</span></div><ProgressBar value={learned} max={46} label="Hiragana aprendidos" className="mt-3 text-[var(--kaku-purple)]" /></header>
+    <header className="mb-8"><p className="text-sm font-semibold text-[var(--nazumo-purple)]">Colección de kana</p><h1 className="mt-2 text-4xl font-extrabold tracking-[-0.055em] sm:text-6xl">Hiragana</h1><div className="mt-7 flex items-center justify-between text-sm"><span><strong>{learned}</strong> de 46 aprendidos</span><span className="text-[var(--muted)]">{Math.round((learned / 46) * 100)}%</span></div><ProgressBar value={learned} max={46} label="Hiragana aprendidos" className="mt-3 text-[var(--nazumo-purple)]" /></header>
     <CharacterGrid rows={rows} stateFor={stateFor} onSelect={setSelected} />
-    <div className="mt-7 flex flex-wrap gap-4 text-xs text-[var(--muted)]"><Legend color="bg-white" label="No aprendido" /><Legend color="bg-[var(--accent-soft)]" label="Aprendiendo" /><Legend color="bg-[var(--kaku-purple)]" label="Aprendido" /><Legend color="bg-[var(--momo)]" label="Repaso" /></div>
+    <div className="mt-7 flex flex-wrap gap-4 text-xs text-[var(--muted)]"><Legend color="bg-white" label="No aprendido" /><Legend color="bg-[var(--accent-soft)]" label="Aprendiendo" /><Legend color="bg-[var(--nazumo-purple)]" label="Aprendido" /><Legend color="bg-[var(--momo)]" label="Repaso" /></div>
     {selected && <KanaDetail kana={selected} state={stateFor(selected) === "mastered" ? "learned" : stateFor(selected) === "review" ? "needs-review" : stateFor(selected) === "learning" ? "learning" : getInitialLearningState()} onClose={() => setSelected(null)} />}
   </>;
 }
