@@ -24,7 +24,8 @@ export function getProgressRepository() { if (typeof window === "undefined") ret
 function notify() { window.dispatchEvent(new Event(PROGRESS_EVENT)); }
 export function loadProgress(): ProgressState | null { return getProgressRepository()?.loadProgress() ?? null; }
 export function updateCharacterProgress(item: PracticeItem, exercise: PracticeExercise, correct: boolean) { const result = getProgressRepository()?.updateCharacterProgress(item.id, { kind: exercise, correct }); if (result) notify(); return result; }
-export function recordCharacterShown(item: PracticeItem) { const result = getProgressRepository()?.recordCharacterShown(item.id); if (result) notify(); return result; }
+// Showing a prompt only updates a display counter, not the learning snapshot used by subscribers.
+export function recordCharacterShown(item: PracticeItem) { return getProgressRepository()?.recordCharacterShown(item.id); }
 export function introduceCharacter(character: string, unitId?: number) { const result = getProgressRepository()?.introduceCharacter(`hiragana:${character}`, unitId); if (result) notify(); return result; }
 export function setCharacterStatus(id: string, status: CharacterLearningStatus) { const result = getProgressRepository()?.setCharacterStatus(id, status); if (result) notify(); return result; }
 export function recordPracticeResult(unit: HiraganaUnit, recognitionCorrect: number, typingCorrect: number) { const result = getProgressRepository()?.recordPracticeResult(unit, recognitionCorrect, typingCorrect); if (result) notify(); return result; }

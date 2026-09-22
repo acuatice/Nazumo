@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { createPracticeSession, createRecognitionOptions, isAnswerCorrect, reshuffleSession } from "@/lib/practice/session";
 import { recordCharacterShown, recordPracticeAnswer } from "@/lib/practice/storage";
 import type { Feedback, InteractionState, PracticeItem, PracticeStage } from "@/lib/practice/types";
@@ -12,6 +12,11 @@ export function usePracticeSession(
   sessionSize: number,
   inputRef: RefObject<HTMLInputElement | null>,
 ) {
+  const availableItemsRef = useRef(availableItems);
+  useEffect(() => {
+    availableItemsRef.current = availableItems;
+  }, [availableItems]);
+  // Snapshot updates must not restart an active session; future sessions use the latest pool.
   const [session, setSession] = useState<PracticeItem[]>([]);
   const [phaseItems, setPhaseItems] = useState<PracticeItem[]>([]);
   const [stage, setStage] = useState<PracticeStage>("loading");
@@ -25,7 +30,8 @@ export function usePracticeSession(
   const [needsReviewIds, setNeedsReviewIds] = useState<string[]>([]);
 
   const startNewSession = useCallback(() => {
-    const nextSession = createPracticeSession(availableItems, sessionSize);
+    const items = availableItemsRef.current;
+    const nextSession = createPracticeSession(items, sessionSize);
     setSession(nextSession);
     setPhaseItems(nextSession);
     setCurrentIndex(0);
@@ -39,10 +45,10 @@ export function usePracticeSession(
       setStage("complete");
       return;
     }
-    setOptions(createRecognitionOptions(nextSession[0], availableItems));
+    setOptions(createRecognitionOptions(nextSession[0], items));
     recordCharacterShown(nextSession[0]);
     setStage("recognition");
-  }, [availableItems, sessionSize]);
+  }, [sessionSize]);
 
   useEffect(() => {
     const initialization = window.setTimeout(startNewSession, 0);
@@ -73,9 +79,9 @@ export function usePracticeSession(
     setAnswer("");
     setFeedback(null);
     setInteraction("question");
-    if (stage === "recognition") setOptions(createRecognitionOptions(nextItem, availableItems));
+    if (stage === "recognition") setOptions(createRecognitionOptions(nextItem, availableItemsRef.current));
     recordCharacterShown(nextItem);
-  }, [availableItems, currentIndex, phaseItems, stage]);
+  }, [currentIndex, phaseItems, stage]);
 
   useEffect(() => {
     if (interaction !== "feedback" || !feedback?.isCorrect) return;
