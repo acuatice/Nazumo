@@ -23,6 +23,7 @@ function getBrowserStorage(): StorageAdapter {
 export function getProgressRepository() { if (typeof window === "undefined") return null; repository ??= new ProgressRepository(getBrowserStorage()); return repository; }
 function notify() { window.dispatchEvent(new Event(PROGRESS_EVENT)); }
 export function loadProgress(): ProgressState | null { return getProgressRepository()?.loadProgress() ?? null; }
+export function replaceProgress(progress: ProgressState) { const result = getProgressRepository()?.saveProgress(progress) ?? null; if (result) notify(); return result; }
 export function updateCharacterProgress(item: PracticeItem, exercise: PracticeExercise, correct: boolean) { const result = getProgressRepository()?.updateCharacterProgress(item.id, { kind: exercise, correct }); if (result) notify(); return result; }
 // Showing a prompt only updates a display counter, not the learning snapshot used by subscribers.
 export function recordCharacterShown(item: PracticeItem) { return getProgressRepository()?.recordCharacterShown(item.id); }

@@ -6,6 +6,7 @@ import type { IconName } from "@/components/ui/icon";
 import { BottomNavigation } from "@/components/navigation/bottom-navigation";
 import { NazumoLogo } from "@/components/brand/nazumo-logo";
 import { useLearnerProfile } from "@/components/account/profile-store";
+import { useAuthenticatedLearner } from "@/hooks/use-authenticated-learner";
 
 const links = [
   { href: "/", label: "Inicio", icon: "home" as IconName },
@@ -17,6 +18,8 @@ const links = [
 export function Navigation() {
   const pathname = usePathname();
   const profile = useLearnerProfile();
+  const account = useAuthenticatedLearner();
+  const learnerName = account?.name || profile?.name;
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href) || (href === "/hiragana" && pathname.startsWith("/learn"));
   if (pathname.startsWith("/practice") || pathname.endsWith("/write")) return null;
   return <>
@@ -25,7 +28,7 @@ export function Navigation() {
       <nav className="hidden items-center gap-1 rounded-full border border-black/[.04] bg-white p-1.5 shadow-sm md:flex">
         {links.map((link) => <Link key={link.href} href={link.href} className={`rounded-xl px-4 py-2 text-sm font-medium transition active:scale-[.98] ${isActive(link.href) ? "bg-[var(--nazumo-purple)] text-white" : "text-[var(--muted)] hover:bg-[var(--rice)] hover:text-[var(--sumi)]"}`}>{link.label}</Link>)}
       </nav>
-      <Link href="/cuenta" aria-label={profile ? `Perfil de ${profile.name}` : "Crear perfil"} className="flex size-10 items-center justify-center overflow-hidden rounded-full bg-[var(--nazumo-lavender)] text-xs font-bold text-[var(--nazumo-purple)] ring-2 ring-white transition hover:scale-105">{profile ? profile.name.slice(0, 1).toUpperCase() : "日"}</Link>
+      <Link href="/cuenta" aria-label={learnerName ? `Perfil de ${learnerName}` : "Crear perfil"} className="flex size-10 items-center justify-center overflow-hidden rounded-full bg-[var(--nazumo-lavender)] text-xs font-bold text-[var(--nazumo-purple)] ring-2 ring-white transition hover:scale-105">{learnerName ? learnerName.slice(0, 1).toUpperCase() : "日"}</Link>
     </header>
     <BottomNavigation items={links} isActive={isActive} />
   </>;

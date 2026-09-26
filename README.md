@@ -25,7 +25,9 @@ pnpm build
 - `src/app`: rutas, layout y estilos globales.
 - `src/components`: shell, navegación y piezas reutilizables de interfaz.
 - `src/lib`: tipos y datos de dominio.
-- `src/hooks`: persistencia de progreso preparada con `localStorage`.
+- `src/hooks`: persistencia local y estado de aprendizaje.
+- `src/lib/supabase`: clientes con cookies para servidor y navegador.
+- `supabase/schema.sql`: tabla de sincronización de progreso con RLS.
 
 ## PWA e iconos
 
@@ -46,18 +48,11 @@ marca. Para sustituirlos en el futuro, conserva los nombres y tamaños de estos 
 - `public/icons/kana-512.png`: icono PWA de 512 × 512 px.
 - `public/icons/kana-maskable-512.png`: icono maskable de 512 × 512 px.
 
-## Deploy del MVP
+## Producción y cuentas
 
-1. Crea un repositorio en GitHub y sube este proyecto.
-2. Entra en Vercel, selecciona **Add New Project** e importa el repositorio.
-3. Mantén la configuración detectada para Next.js y pulsa **Deploy**.
-4. Abre la URL publicada desde Safari en el iPhone.
-5. Pulsa **Compartir**, elige **Añadir a pantalla de inicio** y confirma con
-   **Añadir**. nazumo se abrirá después en una ventana independiente.
+La interfaz de cuenta usa Supabase Auth cuando el proyecto está configurado. Para activar registro, inicio de sesión, confirmación de correo y sincronización entre dispositivos, sigue [`docs/cuenta-y-sincronizacion.md`](docs/cuenta-y-sincronizacion.md).
 
-El progreso continúa guardándose localmente en el dispositivo mediante
-`localStorage`. No se sincroniza entre navegadores o dispositivos y puede
-perderse si se borran los datos de Safari.
+Sin las variables de Supabase, el modo local mantiene el progreso en el navegador. Una vez conectado el backend, el progreso se fusiona con la copia de la cuenta y se sincroniza en segundo plano.
 
 ## Datos de orden de trazos
 

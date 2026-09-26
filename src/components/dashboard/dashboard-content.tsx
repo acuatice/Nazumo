@@ -10,17 +10,20 @@ import { selectProgressiveCharacters } from "@/lib/practice/selection";
 import { useLearnerProfile } from "@/components/account/profile-store";
 import { LearningOnboarding } from "@/components/onboarding/learning-onboarding";
 import { Ten } from "@/components/brand/ten";
+import { useAuthenticatedLearner } from "@/hooks/use-authenticated-learner";
 
 export function DashboardContent() {
   const snapshot = useLearningSnapshot();
   const profile = useLearnerProfile();
+  const account = useAuthenticatedLearner();
+  const learnerName = account?.name || profile?.name;
   const currentUnit = hiraganaCurriculum.find((unit) => unit.id === (snapshot?.currentUnitId ?? 1)) ?? hiraganaCurriculum[0];
   const learned = snapshot?.learnedIds.length ?? 0;
   const reviewCount = snapshot ? selectProgressiveCharacters(snapshot, hiraganaCharacters).length : 0;
 
   return <div className="pb-7 pt-2 sm:pt-6 lg:pt-8 animate-page-in">
     <header className="mb-5 flex max-w-2xl items-start justify-between gap-3 sm:mb-7">
-      <div><p className="text-base font-medium">¡Hola{profile ? `, ${profile.name}` : ""}!</p>
+      <div><p className="text-base font-medium">¡Hola{learnerName ? `, ${learnerName}` : ""}!</p>
       <h1 className="mt-1 max-w-[20rem] text-[2rem] font-extrabold leading-[1.08] tracking-[-.055em] min-[375px]:text-[2.25rem] sm:max-w-2xl sm:text-5xl">Hoy es un buen día para aprender japonés.</h1>
       </div><Ten mood="happy" size={52} className="mt-1 shrink-0" />
     </header>
