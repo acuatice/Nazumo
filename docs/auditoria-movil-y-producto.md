@@ -1,0 +1,46 @@
+# Auditoría móvil y de producto de Nazumo
+
+**Fecha:** 26 de septiembre de 2026  
+**Entorno revisado:** producción en `https://nazumo.vercel.app` y compilación local de producción  
+**Viewport móvil:** 390 × 844 px
+
+## Estado observado
+
+- La interfaz ya se comporta como una app móvil: navegación inferior fija con Inicio, Aprender, Práctica y Progreso; áreas seguras para iOS; tarjetas táctiles; PWA instalable y transiciones entre rutas.
+- El recorrido principal de hiragana ofrece una ruta progresiva de reconocimiento, escritura y práctica. La guía de inicio explica el primer paso y se puede omitir.
+- Inicio muestra el avance y un acceso a continuar. El vocabulario estaba separado de esa ruta; ahora Inicio prioriza los repasos vencidos y dirige a `/vocabulario`.
+- Vocabulario incluye 12 palabras en contexto, tandas de cinco, revelado de traducción y ejemplo, autoevaluación y un calendario local de repasos.
+- La página Progreso muestra unidades completadas, caracteres y sesiones. Los repasos de vocabulario cuentan ahora como actividad diaria para la racha.
+- El perfil público sigue siendo local. El backend de autenticación y sincronización está integrado en el código, pero Producción no muestra login porque aún no tiene un proyecto Supabase ni las variables de entorno configuradas.
+
+## Comparación de patrones de producto
+
+| Patrón observado en otras apps | Implicación para Nazumo | Estado |
+| --- | --- | --- |
+| Duolingo acorta la tarea diaria y mezcla repaso con avance por la ruta. | Hacer visible una acción concreta al volver a Inicio; no dejar vocabulario como isla. | CTA dinámico hacia los repasos vencidos; el resto de rutas existentes se conserva. |
+| Busuu y LingoDeer vuelven antes sobre elementos débiles y espacian los que el alumno recuerda. | Programar por palabra, con autoevaluación rápida y sesiones pequeñas. | Hecho para las 12 palabras: intervalos de 1, 3, 7, 14 y 30 días; las difíciles vuelven en 10 minutos. |
+| Las apps de aprendizaje necesitan continuidad entre sesiones y dispositivos. | El progreso, la actividad diaria y el calendario de repaso deben sobrevivir al cambio de dispositivo. | El modelo de repaso ya forma parte del estado sincronizable; login y sincronización de producción esperan la configuración de Supabase. |
+| Una interfaz móvil de uso frecuente necesita navegación reconocible y respuesta sin brusquedad. | Mantener navegación inferior, animar las transiciones y respetar movimiento reducido. | Hecho: navegación, transiciones, línea y Ten animados; la hoja global limita animaciones para `prefers-reduced-motion`. |
+
+## Mejoras realizadas en esta auditoría
+
+- Repaso espaciado en tandas breves con selección de palabras vencidas y nuevas.
+- Estado del vocabulario fusionado entre copias locales y remotas, con validación de fechas e intervalos.
+- Las revisiones actualizan la actividad diaria y la racha.
+- Inicio detecta repasos vencidos y los convierte en el siguiente paso destacado.
+- Los intervalos usan días UTC para evitar cambios de una hora al cruzar el horario de verano.
+- Revisión visual de Inicio, Vocabulario y Progreso a 390 × 844 px, y confirmación de que Vocabulario y la navegación nueva responden correctamente.
+
+## Pendiente para cerrar el objetivo
+
+1. Crear el proyecto Supabase en una organización del usuario, ejecutar [`../supabase/schema.sql`](../supabase/schema.sql) y configurar las URL de retorno indicadas en [`cuenta-y-sincronizacion.md`](./cuenta-y-sincronizacion.md).
+2. Añadir en Vercel `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `NEXT_PUBLIC_SITE_URL` para Producción, Preview y Development; desplegar y probar alta, confirmación por correo, inicio, recuperación y sincronización en dos dispositivos.
+3. Ampliar la práctica de vocabulario con audio japonés y una modalidad de respuesta escrita; hoy el repaso evalúa recuerdo mediante autoevaluación.
+4. Incorporar una meta diaria configurable y mostrar su avance junto al siguiente paso, manteniendo rachas sin presión excesiva.
+
+## Referencias de producto
+
+- [Duolingo: diseño de ruta, repaso espaciado y práctica integrada](https://blog.duolingo.com/new-duolingo-home-screen-design/)
+- [Duolingo: metas pequeñas y práctica habitual](https://blog.duolingo.com/putting-in-work-the-habit-of-language-learning/)
+- [Busuu: repaso de vocabulario y algoritmo de repetición espaciada](https://www.busuu.com/en/english/personalized-study-plan-busuu-premium)
+- [LingoDeer: sistema SRS y programación según el dominio](https://support.lingodeer.com/en/support/solutions/articles/61000319118-how-does-the-spaced-repetition-system-srs-work-)
