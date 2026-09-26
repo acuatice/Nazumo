@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "nazumo:learning-guide-seen";
 
@@ -36,11 +36,14 @@ const steps = [
 export function LearningOnboarding() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
 
   const finish = useCallback(() => {
     try { window.localStorage.setItem(STORAGE_KEY, "true"); } catch { /* The guide still works when browser storage is unavailable. */ }
     setOpen(false);
     setStep(0);
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
   useEffect(() => {
@@ -53,23 +56,38 @@ export function LearningOnboarding() {
 
   useEffect(() => {
     if (!open) return;
+    const dialog = dialogRef.current;
+    const appContent = document.getElementById("app-content");
+    const previousInert = appContent?.inert ?? false;
+    if (appContent) appContent.inert = true;
+    const focusable = dialog?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    focusable?.[0]?.focus();
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") finish();
+      if (event.key === "Tab" && focusable?.length) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (appContent) appContent.inert = previousInert;
+    };
   }, [finish, open]);
 
   const current = steps[step];
 
   return <>
-    <button type="button" onClick={() => { setStep(0); setOpen(true); }} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--nazumo-purple)]/15 bg-white/75 px-4 text-sm font-bold text-[var(--nazumo-purple)] transition hover:-translate-y-0.5 hover:shadow-md active:scale-[.98]">
+    <button ref={triggerRef} type="button" onClick={() => { setStep(0); setOpen(true); }} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--nazumo-purple)]/15 bg-white/75 px-4 text-sm font-bold text-[var(--nazumo-purple)] transition hover:-translate-y-0.5 hover:shadow-md active:scale-[.98]">
       <span aria-hidden="true" className="flex size-5 items-center justify-center rounded-full bg-[var(--nazumo-lavender)] text-xs">?</span>
       Cómo funciona
     </button>
 
     {open && createPortal(<div className="onboarding-overlay fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[var(--nazumo-ink)]/45 p-3 pt-[max(.75rem,env(safe-area-inset-top))] backdrop-blur-sm sm:items-center sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) finish(); }}>
-      <section role="dialog" aria-modal="true" aria-labelledby="onboarding-title" aria-describedby="onboarding-description" className="onboarding-card relative my-auto w-full max-w-lg overflow-hidden rounded-[1.65rem] bg-white p-4 shadow-[0_30px_100px_rgba(29,27,45,.28)] min-[375px]:p-5 sm:rounded-[2rem] sm:p-8">
+      <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="onboarding-title" aria-describedby="onboarding-description" tabIndex={-1} className="onboarding-card relative my-auto w-full max-w-lg overflow-hidden rounded-[1.65rem] bg-white p-4 shadow-[0_30px_100px_rgba(29,27,45,.28)] min-[375px]:p-5 sm:rounded-[2rem] sm:p-8">
         <div className={`onboarding-art flex min-h-40 items-center justify-center overflow-hidden rounded-[1.5rem] ${current.color}`}>
           <span aria-hidden="true" className="onboarding-orbit onboarding-orbit-one" />
           <span aria-hidden="true" className="onboarding-orbit onboarding-orbit-two" />
