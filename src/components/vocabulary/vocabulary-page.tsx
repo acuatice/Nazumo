@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Icon } from "@/components/ui/icon";
 import { vocabulary, type VocabularyEntry } from "@/data/vocabulary";
@@ -33,6 +33,10 @@ function getReviewStorage() {
   catch { return memoryStorage; }
 }
 
+function normalizeMeaning(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es").replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
+}
+
 export function VocabularyPage() {
   const [review, setReview] = useState<VocabularyReviewState | null>(null);
   const [round, setRound] = useState<readonly VocabularyEntry[]>([]);
@@ -41,6 +45,9 @@ export function VocabularyPage() {
   const [completed, setCompleted] = useState(false);
   const [remembered, setRemembered] = useState(0);
   const [speechStatus, setSpeechStatus] = useState("");
+  const [writeMode, setWriteMode] = useState(false);
+  const [answer, setAnswer] = useState("");
+  const [answerCorrect, setAnswerCorrect] = useState<boolean | null>(null);
 
   useEffect(() => {
     const initialize = () => {
@@ -90,6 +97,9 @@ export function VocabularyPage() {
     setRemembered(0);
     setRevealed(false);
     setCompleted(false);
+    setWriteMode(false);
+    setAnswer("");
+    setAnswerCorrect(null);
   }
 
   function rate(rating: VocabularyRating) {
@@ -101,8 +111,19 @@ export function VocabularyPage() {
     setReview(next);
     if (rating === "remembered") setRemembered((count) => count + 1);
     setRevealed(false);
+    setWriteMode(false);
+    setAnswer("");
+    setAnswerCorrect(null);
     if (index + 1 >= round.length) setCompleted(true);
     else setIndex((current) => current + 1);
+  }
+
+  function checkAnswer(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!item || !answer.trim()) return;
+    const acceptedAnswers = item.meaning.split(/[\/;,]/).map(normalizeMeaning);
+    setAnswerCorrect(acceptedAnswers.includes(normalizeMeaning(answer)));
+    setRevealed(true);
   }
 
   function speakJapanese(text: string) {
@@ -130,16 +151,20 @@ export function VocabularyPage() {
       <Stat value={`${known}/${vocabulary.length}`} label="consolidadas" />
     </section>
 
-    {item && !completed ? <section aria-live="polite" className="mt-5 overflow-hidden rounded-[1.65rem] bg-white shadow-[0_18px_55px_rgba(52,24,114,.09)]">
+    {item && !completed ? <section aria-label="Palabra actual" className="mt-5 overflow-hidden rounded-[1.65rem] bg-white shadow-[0_18px_55px_rgba(52,24,114,.09)]">
       <div className="flex items-center justify-between gap-3 bg-[var(--nazumo-lavender)]/55 px-5 py-4 sm:px-6"><span className="truncate text-xs font-bold uppercase tracking-[.1em] text-[var(--nazumo-purple)]">{item.category}</span><span className="shrink-0 text-xs font-semibold text-[var(--muted)]">{index + 1} / {round.length}</span></div>
       <ProgressBar value={index + 1} max={round.length} label="Progreso de esta tanda" className="mx-5 mt-4 w-[calc(100%-2.5rem)] text-[var(--nazumo-purple)] sm:mx-6 sm:w-[calc(100%-3rem)]" />
       <div key={item.japanese} className="animate-question-in p-5 sm:p-8">
+        <span className="sr-only" aria-live="polite">Palabra {index + 1} de {round.length}: {item.japanese}</span>
         <p lang="ja" className="font-japanese text-6xl font-bold tracking-wide sm:text-8xl">{item.japanese}</p>
         <p className="mt-3 text-base font-semibold text-[var(--nazumo-purple)]">{item.reading}</p>
         <button type="button" onClick={() => speakJapanese(item.japanese)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--nazumo-purple)]/20 bg-white px-4 text-sm font-bold text-[var(--nazumo-purple)] transition hover:bg-[var(--nazumo-lavender)]/30 active:scale-[.98]" aria-label={`Escuchar pronunciación japonesa de ${item.japanese}`}><Icon name="volume" className="size-4" />Escuchar japonés</button>
         <span className="sr-only" aria-live="polite">{speechStatus}</span>
         {revealed ? <div className="mt-6 rounded-2xl bg-[var(--nazumo-cream)] p-4 animate-feedback-in sm:p-5"><p className="text-xl font-extrabold">{item.meaning}</p><p lang="ja" className="font-japanese mt-4 text-2xl font-bold">{item.example}</p><p className="mt-1 text-sm text-[var(--nazumo-purple)]">{item.exampleReading}</p><p className="mt-2 text-sm text-[var(--muted)]">{item.exampleMeaning}</p></div> : <div className="mt-6 flex min-h-20 items-center justify-center rounded-2xl border border-dashed border-[var(--border)] px-5 text-center text-sm text-[var(--muted)]">¿Qué significa? Piensa un momento antes de revelar.</div>}
-        {!revealed ? <button type="button" onClick={() => setRevealed(true)} className="mt-5 min-h-12 w-full rounded-full bg-[var(--nazumo-purple)] px-6 text-sm font-bold text-white transition active:scale-[.99]">Revelar significado</button> : <div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={() => rate("forgot")} className="min-h-12 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold text-[var(--sumi)] transition active:scale-[.99]">Me costó</button><button type="button" onClick={() => rate("remembered")} className="min-h-12 rounded-full bg-[var(--nazumo-purple)] px-3 text-sm font-bold text-white transition active:scale-[.99]">La recordaba</button></div>}
+        {!revealed && !writeMode ? <div className="mt-5 space-y-3"><button type="button" onClick={() => setRevealed(true)} className="min-h-12 w-full rounded-full bg-[var(--nazumo-purple)] px-6 text-sm font-bold text-white transition active:scale-[.99]">Revelar significado</button><button type="button" onClick={() => setWriteMode(true)} className="min-h-12 w-full rounded-full border border-[var(--nazumo-purple)]/20 bg-white px-6 text-sm font-bold text-[var(--nazumo-purple)] transition active:scale-[.99]">Responder escribiendo</button></div> : null}
+        {writeMode && !revealed ? <form onSubmit={checkAnswer} className="mt-5 space-y-3"><label htmlFor="vocabulary-answer" className="block text-sm font-bold">Escribe su significado en español<input id="vocabulary-answer" value={answer} onChange={(event) => setAnswer(event.currentTarget.value)} autoComplete="off" autoCapitalize="sentences" enterKeyHint="done" maxLength={120} className="mt-2 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--nazumo-cream)] px-4 font-normal outline-none focus:border-[var(--nazumo-purple)]" placeholder="Tu respuesta" /></label><button type="submit" disabled={!answer.trim()} className="min-h-12 w-full rounded-full bg-[var(--nazumo-purple)] px-6 text-sm font-bold text-white transition active:scale-[.99] disabled:cursor-not-allowed disabled:opacity-50">Comprobar respuesta</button><button type="button" onClick={() => { setWriteMode(false); setAnswer(""); }} className="min-h-11 w-full rounded-full px-4 text-sm font-bold text-[var(--muted)]">Volver al recuerdo mental</button></form> : null}
+        {revealed && writeMode ? <div className="mt-5 space-y-3"><p role="status" className={`rounded-xl p-4 text-sm font-bold ${answerCorrect ? "bg-[var(--nazumo-lime)]/60 text-[var(--nazumo-ink)]" : "bg-[var(--nazumo-pink)]/55 text-[var(--nazumo-ink)]"}`}>{answerCorrect ? "¡Muy bien! Has recordado el significado." : `La respuesta era: ${item.meaning}. La volveremos a practicar pronto.`}</p><button type="button" onClick={() => rate(answerCorrect ? "remembered" : "forgot")} className="min-h-12 w-full rounded-full bg-[var(--nazumo-purple)] px-6 text-sm font-bold text-white transition active:scale-[.99]">Siguiente palabra</button></div> : null}
+        {revealed && !writeMode ? <div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={() => rate("forgot")} className="min-h-12 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold text-[var(--sumi)] transition active:scale-[.99]">Me costó</button><button type="button" onClick={() => rate("remembered")} className="min-h-12 rounded-full bg-[var(--nazumo-purple)] px-3 text-sm font-bold text-white transition active:scale-[.99]">La recordaba</button></div> : null}
       </div>
     </section> : completed ? <section role="status" className="mt-5 rounded-[1.65rem] bg-[var(--nazumo-purple)] p-6 text-white sm:p-8"><p className="text-xs font-bold uppercase tracking-[.14em] text-[var(--nazumo-lime)]">Tanda terminada</p><h2 className="mt-2 text-3xl font-extrabold tracking-[-.05em]">Buen trabajo.</h2><p className="mt-2 text-sm text-white/80">Recordaste {remembered} de {round.length} palabras. Las difíciles volverán antes; las que sabías esperarán más.</p><button type="button" onClick={startNextRound} className="mt-6 min-h-12 w-full rounded-full bg-white px-6 text-sm font-bold text-[var(--nazumo-purple)] transition active:scale-[.99]">Empezar otra tanda</button></section> : <section className="mt-5 rounded-[1.65rem] bg-white p-6 text-center shadow-[0_18px_55px_rgba(52,24,114,.09)] sm:p-8"><span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[var(--nazumo-lime)] text-xl" aria-hidden="true">✓</span><h2 className="mt-4 text-2xl font-extrabold tracking-[-.04em]">No hay repasos pendientes.</h2><p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">Has trabajado las {vocabulary.length} palabras disponibles. Las siguientes aparecerán cuando toque repasarlas.</p><div className="mt-6 grid gap-3 sm:grid-cols-2"><button type="button" onClick={startNextRound} className="min-h-12 rounded-full border border-[var(--border)] px-5 text-sm font-bold">Actualizar tanda</button><Link href="/hiragana" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--nazumo-purple)] px-5 text-sm font-bold text-white">Repasar hiragana</Link></div></section>}
 
