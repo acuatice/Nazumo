@@ -11,8 +11,8 @@
 - Inicio muestra el avance y un acceso a continuar. El vocabulario estaba separado de esa ruta; ahora Inicio prioriza los repasos vencidos y dirige a `/vocabulario`.
 - Vocabulario incluye 12 palabras en contexto, tandas de cinco, revelado de traducción y ejemplo, autoevaluación, respuesta escrita en español y repasos espaciados. La tarjeta también permite escuchar la palabra con la voz japonesa del dispositivo.
 - La página Progreso muestra unidades completadas, caracteres y sesiones. Los repasos de vocabulario cuentan ahora como actividad diaria para la racha.
-- La cuenta real con Supabase ya está activa en producción: `/cuenta` ofrece inicio de sesión, alta, recuperación y confirmación de contraseña; la navegación móvil identifica el acceso como “Cuenta”.
-- El endpoint de progreso en producción devuelve `401 unauthorized` sin una sesión, señal de que no permite acceso anónimo. Falta recorrer alta y confirmación con una cuenta de prueba y verificar la continuidad en un segundo dispositivo.
+- La cuenta real con Supabase ya está activa en producción: `/cuenta` ofrece inicio de sesión, alta, recuperación y confirmación de contraseña; la navegación móvil identifica el acceso como “Cuenta”. El usuario confirma que el login y el flujo de cuenta funcionan.
+- El endpoint de progreso en producción devuelve `401 unauthorized` sin una sesión, señal de que no permite acceso anónimo. La continuidad de progreso entre dispositivos y las políticas RLS tras una primera escritura requieren una comprobación específica con datos de una cuenta autenticada.
 - La guía inicial mantiene el foco dentro del diálogo, vuelve al botón que la abrió al cerrarse y deja el resto de la app inerte mientras está abierta.
 
 ## Comparación de patrones de producto
@@ -38,11 +38,10 @@
 - Pronunciación japonesa opcional en vocabulario, probada en móvil a 375 × 812 px; la tarjeta conserva la traducción oculta hasta que el alumno la revele.
 - Recuperación escrita opcional: las respuestas correctas avanzan el intervalo y las incorrectas muestran la respuesta y vuelven a práctica en 10 minutos. Recorrido móvil probado con un acierto y un error.
 
-## Pendiente para cerrar el objetivo
+## Siguientes mejoras recomendadas
 
-1. Crear una cuenta de prueba, confirmar el correo, iniciar sesión y probar recuperación de contraseña en producción.
-2. Verificar que el progreso local se fusiona con la cuenta y reaparece al iniciar sesión en otro dispositivo; revisar las políticas RLS después de la primera escritura.
-3. Incorporar una meta diaria configurable y mostrar su avance junto al siguiente paso, manteniendo rachas sin presión excesiva.
+1. Comprobar con una cuenta autenticada que el progreso local se fusiona con el remoto y reaparece en otra sesión o dispositivo; revisar las políticas RLS tras una primera escritura.
+2. Incorporar una meta diaria configurable y mostrar su avance junto al siguiente paso, manteniendo rachas sin presión excesiva.
 
 ## Referencias de producto
 
