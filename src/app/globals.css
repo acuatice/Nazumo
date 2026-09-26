@@ -145,6 +145,24 @@ input, textarea, select { font-size: max(16px, 1em); }
   to { stroke-dashoffset: 0; }
 }
 
+@keyframes nazumo-line-drift {
+  to { stroke-dashoffset: -56; }
+}
+
+@keyframes ten-bob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-2px) rotate(-1.25deg); }
+}
+
+.ten-bob { transform-box: fill-box; transform-origin: center; animation: ten-bob 3.4s ease-in-out infinite; }
+.nazumo-line { stroke-dasharray: 2 6; animation: nazumo-line-drift 8s linear infinite; }
+
+::view-transition-old(.nazumo-route) { animation: route-out 140ms ease-in both; }
+::view-transition-new(.nazumo-route) { animation: route-in 220ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes route-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes route-out { to { opacity: 0; transform: translateY(-3px); } }
+::view-transition { pointer-events: none; }
+
 .animate-stroke-order {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -158,4 +176,6 @@ input, textarea, select { font-size: max(16px, 1em); }
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+  .ten-bob, .nazumo-line { animation: none !important; }
+  ::view-transition-old(.nazumo-route), ::view-transition-new(.nazumo-route) { animation: none !important; }
 }

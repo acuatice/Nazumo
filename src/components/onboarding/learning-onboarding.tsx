@@ -68,8 +68,8 @@ export function LearningOnboarding() {
       Cómo funciona
     </button>
 
-    {open && createPortal(<div className="onboarding-overlay fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[var(--nazumo-ink)]/45 p-4 backdrop-blur-sm sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) finish(); }}>
-      <section role="dialog" aria-modal="true" aria-labelledby="onboarding-title" aria-describedby="onboarding-description" className="onboarding-card relative my-auto w-full max-w-lg overflow-hidden rounded-[2rem] bg-white p-5 shadow-[0_30px_100px_rgba(29,27,45,.28)] sm:p-8">
+    {open && createPortal(<div className="onboarding-overlay fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[var(--nazumo-ink)]/45 p-3 pt-[max(.75rem,env(safe-area-inset-top))] backdrop-blur-sm sm:items-center sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget) finish(); }}>
+      <section role="dialog" aria-modal="true" aria-labelledby="onboarding-title" aria-describedby="onboarding-description" className="onboarding-card relative my-auto w-full max-w-lg overflow-hidden rounded-[1.65rem] bg-white p-4 shadow-[0_30px_100px_rgba(29,27,45,.28)] min-[375px]:p-5 sm:rounded-[2rem] sm:p-8">
         <div className={`onboarding-art flex min-h-40 items-center justify-center overflow-hidden rounded-[1.5rem] ${current.color}`}>
           <span aria-hidden="true" className="onboarding-orbit onboarding-orbit-one" />
           <span aria-hidden="true" className="onboarding-orbit onboarding-orbit-two" />
