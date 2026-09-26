@@ -11,7 +11,9 @@
 - Inicio muestra el avance y un acceso a continuar. El vocabulario estaba separado de esa ruta; ahora Inicio prioriza los repasos vencidos y dirige a `/vocabulario`.
 - Vocabulario incluye 12 palabras en contexto, tandas de cinco, revelado de traducción y ejemplo, autoevaluación y un calendario local de repasos.
 - La página Progreso muestra unidades completadas, caracteres y sesiones. Los repasos de vocabulario cuentan ahora como actividad diaria para la racha.
-- El perfil público sigue siendo local. El backend de autenticación y sincronización está integrado en el código, pero Producción no muestra login porque aún no tiene un proyecto Supabase ni las variables de entorno configuradas.
+- La cuenta real con Supabase ya está activa en producción: `/cuenta` ofrece inicio de sesión, alta, recuperación y confirmación de contraseña; la navegación móvil identifica el acceso como “Cuenta”.
+- El endpoint de progreso en producción devuelve `401 unauthorized` sin una sesión, señal de que no permite acceso anónimo. Falta recorrer alta y confirmación con una cuenta de prueba y verificar la continuidad en un segundo dispositivo.
+- La guía inicial mantiene el foco dentro del diálogo, vuelve al botón que la abrió al cerrarse y deja el resto de la app inerte mientras está abierta.
 
 ## Comparación de patrones de producto
 
@@ -19,7 +21,7 @@
 | --- | --- | --- |
 | Duolingo acorta la tarea diaria y mezcla repaso con avance por la ruta. | Hacer visible una acción concreta al volver a Inicio; no dejar vocabulario como isla. | CTA dinámico hacia los repasos vencidos; el resto de rutas existentes se conserva. |
 | Busuu y LingoDeer vuelven antes sobre elementos débiles y espacian los que el alumno recuerda. | Programar por palabra, con autoevaluación rápida y sesiones pequeñas. | Hecho para las 12 palabras: intervalos de 1, 3, 7, 14 y 30 días; las difíciles vuelven en 10 minutos. |
-| Las apps de aprendizaje necesitan continuidad entre sesiones y dispositivos. | El progreso, la actividad diaria y el calendario de repaso deben sobrevivir al cambio de dispositivo. | El modelo de repaso ya forma parte del estado sincronizable; login y sincronización de producción esperan la configuración de Supabase. |
+| Las apps de aprendizaje necesitan continuidad entre sesiones y dispositivos. | El progreso, la actividad diaria y el calendario de repaso deben sobrevivir al cambio de dispositivo. | Supabase Auth y el endpoint protegido están activos; la sincronización entre dos sesiones/dispositivos queda pendiente de una prueba con cuenta real. |
 | Una interfaz móvil de uso frecuente necesita navegación reconocible y respuesta sin brusquedad. | Mantener navegación inferior, animar las transiciones y respetar movimiento reducido. | Hecho: navegación, transiciones, línea y Ten animados; la hoja global limita animaciones para `prefers-reduced-motion`. |
 
 ## Mejoras realizadas en esta auditoría
@@ -30,11 +32,13 @@
 - Inicio detecta repasos vencidos y los convierte en el siguiente paso destacado.
 - Los intervalos usan días UTC para evitar cambios de una hora al cruzar el horario de verano.
 - Revisión visual de Inicio, Vocabulario y Progreso a 390 × 844 px, y confirmación de que Vocabulario y la navegación nueva responden correctamente.
+- Revisión de `/cuenta` y el onboarding a 375 × 812 px; alta, recuperación y acceso visibles en producción; flujo de teclado del diálogo comprobado en local.
+- Enlace de cuenta explícito en navegación móvil y callback compatible con `code` PKCE y `token_hash` de Supabase.
 
 ## Pendiente para cerrar el objetivo
 
-1. Crear el proyecto Supabase en una organización del usuario, ejecutar [`../supabase/schema.sql`](../supabase/schema.sql) y configurar las URL de retorno indicadas en [`cuenta-y-sincronizacion.md`](./cuenta-y-sincronizacion.md).
-2. Añadir en Vercel `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `NEXT_PUBLIC_SITE_URL` para Producción, Preview y Development; desplegar y probar alta, confirmación por correo, inicio, recuperación y sincronización en dos dispositivos.
+1. Crear una cuenta de prueba, confirmar el correo, iniciar sesión y probar recuperación de contraseña en producción.
+2. Verificar que el progreso local se fusiona con la cuenta y reaparece al iniciar sesión en otro dispositivo; revisar las políticas RLS después de la primera escritura.
 3. Ampliar la práctica de vocabulario con audio japonés y una modalidad de respuesta escrita; hoy el repaso evalúa recuerdo mediante autoevaluación.
 4. Incorporar una meta diaria configurable y mostrar su avance junto al siguiente paso, manteniendo rachas sin presión excesiva.
 
