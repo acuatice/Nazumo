@@ -7,7 +7,7 @@ import { useLearningSnapshot } from "@/hooks/use-learning-snapshot";
 import { clearLearnerProfile, saveLearnerProfile, useLearnerProfile } from "@/components/account/profile-store";
 import { signOut } from "@/app/cuenta/actions";
 
-export function AccountPage({ authEnabled = false, user = null, authPanel, authMode = "auth" }: { authEnabled?: boolean; user?: { name: string; email: string } | null; authPanel?: ReactNode; authMode?: "auth" | "reset" }) {
+export function AccountPage({ authEnabled = false, user = null, authPanel, authMode = "auth", authUnavailable = false }: { authEnabled?: boolean; user?: { name: string; email: string } | null; authPanel?: ReactNode; authMode?: "auth" | "reset"; authUnavailable?: boolean }) {
   const profile = useLearnerProfile();
   const progress = useLearningSnapshot();
   const [error, setError] = useState("");
@@ -54,6 +54,7 @@ export function AccountPage({ authEnabled = false, user = null, authPanel, authM
         <p className="text-xs font-bold uppercase tracking-[.14em] text-[var(--nazumo-purple)]">Tu espacio de aprendizaje</p>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-.06em] sm:text-5xl">Un pequeño perfil para tu viaje.</h1>
         <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">Guarda tu nombre y correo en este navegador para personalizar tu experiencia.</p>
+        {authUnavailable ? <p role="status" className="mt-5 rounded-2xl bg-[var(--nazumo-lime)]/50 p-4 text-sm font-semibold text-[var(--nazumo-ink)]">El acceso con cuenta aún no está conectado. Puedes seguir estudiando; tu progreso permanece guardado en este dispositivo.</p> : null}
         <form onSubmit={submit} className="mt-8 space-y-5" noValidate>
           <label className="block text-sm font-bold" htmlFor="account-name">¿Cómo te llamas?<input id="account-name" name="name" autoComplete="name" required minLength={2} maxLength={40} className="mt-2 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--nazumo-cream)] px-4 font-normal outline-none focus:border-[var(--nazumo-purple)]" placeholder="Tu nombre" /></label>
           <label className="block text-sm font-bold" htmlFor="account-email">Correo electrónico<input id="account-email" name="email" type="email" autoComplete="email" required className="mt-2 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--nazumo-cream)] px-4 font-normal outline-none focus:border-[var(--nazumo-purple)]" placeholder="hola@ejemplo.com" /></label>

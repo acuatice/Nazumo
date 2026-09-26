@@ -16,5 +16,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
   } : null;
 
   const authMode = params.mode === "reset" ? "reset" : "auth";
-  return <AccountPage authEnabled={authEnabled} user={user} authMode={authMode} authPanel={authEnabled ? <AuthPanel status={params.auth} mode={authMode} /> : null} />;
+  return <AccountPage authEnabled={authEnabled} user={user} authMode={authMode} authUnavailable={params.auth === "unavailable"} authPanel={authEnabled ? <AuthPanel status={params.auth} mode={authMode} /> : null} />;
 }
