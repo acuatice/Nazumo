@@ -21,7 +21,7 @@ export function readVocabularyReviewState(storage: Pick<Storage, "getItem">): Vo
     const raw = storage.getItem(KEY);
     if (!raw) return createVocabularyReviewState();
     const value: unknown = JSON.parse(raw);
-    if (typeof value !== "object" || value === null || !("items" in value) || typeof value.items !== "object" || value.items === null || Array.isArray(value.items)) return createVocabularyReviewState();
+    if (typeof value !== "object" || value === null || !("items" in value) || typeof value.items !== "object" || value.items === null || Array.isArray(value.items) || Object.keys(value.items).length > 500) return createVocabularyReviewState();
     const items: Record<string, VocabularyReviewItem> = {};
     for (const [id, item] of Object.entries(value.items)) {
       if (typeof item !== "object" || item === null || !("box" in item) || !("dueAt" in item) || !("lastSeenAt" in item) || !("lapses" in item)) continue;
@@ -87,7 +87,19 @@ export function countKnownVocabulary(state: VocabularyReviewState) {
 }
 
 export function vocabularyReviewFromProgress(progress: ProgressState): VocabularyReviewState {
-  return { items: progress.vocabularyReview ?? {} };
+  const items: Record<string, VocabularyReviewItem> = {};
+  for (const [id, item] of Object.entries(progress.vocabularyReview ?? {})) {
+    if (isVocabularyReviewItem(item)) items[id] = item;
+  }
+  return { items };
+}
+
+function isVocabularyReviewItem(value: unknown): value is VocabularyReviewItem {
+  return typeof value === "object" && value !== null
+    && "box" in value && typeof value.box === "number" && Number.isInteger(value.box) && value.box >= 0 && value.box <= INTERVAL_DAYS.length
+    && "dueAt" in value && typeof value.dueAt === "string" && Number.isFinite(Date.parse(value.dueAt))
+    && "lastSeenAt" in value && typeof value.lastSeenAt === "string" && Number.isFinite(Date.parse(value.lastSeenAt))
+    && "lapses" in value && typeof value.lapses === "number" && Number.isInteger(value.lapses) && value.lapses >= 0;
 }
 
 export function mergeVocabularyReviews(local: VocabularyReviewState, cloud: VocabularyReviewState): VocabularyReviewState {
