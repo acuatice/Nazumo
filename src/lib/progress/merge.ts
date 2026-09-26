@@ -60,5 +60,25 @@ export function mergeProgressStates(local: ProgressState, cloud: ProgressState):
     characters: Object.fromEntries(Array.from(new Set([...Object.keys(local.characters), ...Object.keys(cloud.characters)]), (id) => [id, mergeCharacter(local.characters[id], cloud.characters[id])] as const)),
     units: Object.fromEntries(Array.from(new Set([...Object.keys(local.units), ...Object.keys(cloud.units)]), (id) => [id, mergeUnit(local.units[id], cloud.units[id])] as const)),
     sessions: [...sessions.values()].sort((left, right) => left.completedAt.localeCompare(right.completedAt)).slice(-100),
+    vocabularyReview: mergeVocabularyReviewItems(local.vocabularyReview, cloud.vocabularyReview),
   };
+}
+
+function mergeVocabularyReviewItems(
+  local: ProgressState["vocabularyReview"],
+  cloud: ProgressState["vocabularyReview"],
+) {
+  if (!local && !cloud) return undefined;
+  const items: NonNullable<ProgressState["vocabularyReview"]> = {};
+  for (const id of new Set([...Object.keys(local ?? {}), ...Object.keys(cloud ?? {})])) {
+    const localItem = local?.[id];
+    const cloudItem = cloud?.[id];
+    if (!localItem) items[id] = cloudItem!;
+    else if (!cloudItem) items[id] = localItem;
+    else {
+      const latest = localItem.lastSeenAt >= cloudItem.lastSeenAt ? localItem : cloudItem;
+      items[id] = { ...latest, lapses: Math.max(localItem.lapses, cloudItem.lapses) };
+    }
+  }
+  return items;
 }

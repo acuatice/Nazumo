@@ -39,5 +39,14 @@ export function isSyncableProgressState(value: unknown): value is ProgressState 
     && typeof profile.lastSavedAt === "string"
     && Object.values(value.characters).every(isCharacter)
     && Object.values(value.units).every(isUnit)
-    && value.sessions.length <= 100 && value.sessions.every(isAttempt);
+    && value.sessions.length <= 100 && value.sessions.every(isAttempt)
+    && (value.vocabularyReview === undefined || isRecord(value.vocabularyReview) && Object.values(value.vocabularyReview).length <= 500 && Object.values(value.vocabularyReview).every(isVocabularyReviewItem));
+}
+
+function isVocabularyReviewItem(value: unknown) {
+  return isRecord(value)
+    && isCount(value.box) && value.box <= 5
+    && typeof value.dueAt === "string" && Number.isFinite(Date.parse(value.dueAt))
+    && typeof value.lastSeenAt === "string" && Number.isFinite(Date.parse(value.lastSeenAt))
+    && isCount(value.lapses);
 }

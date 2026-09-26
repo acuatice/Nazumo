@@ -41,4 +41,18 @@ describe("mergeProgressStates", () => {
     expect(merged.characters.a.recognitionAttempts).toBe(3);
     expect(merged.characters.a.timesShown).toBe(8);
   });
+
+  it("keeps the latest spaced-review schedule from either device and the highest lapse count", () => {
+    const local = createInitialProgress("2026-09-26T09:00:00.000Z");
+    const cloud = createInitialProgress("2026-09-26T09:00:00.000Z");
+    local.vocabularyReview = { 水: { box: 0, dueAt: "2026-09-26T09:10:00.000Z", lastSeenAt: "2026-09-26T09:00:00.000Z", lapses: 2 } };
+    cloud.vocabularyReview = { 水: { box: 2, dueAt: "2026-09-29T09:00:00.000Z", lastSeenAt: "2026-09-26T09:05:00.000Z", lapses: 1 }, 火: { box: 1, dueAt: "2026-09-27T09:05:00.000Z", lastSeenAt: "2026-09-26T09:05:00.000Z", lapses: 0 } };
+
+    const merged = mergeProgressStates(local, cloud);
+
+    expect(merged.vocabularyReview).toEqual({
+      水: { box: 2, dueAt: "2026-09-29T09:00:00.000Z", lastSeenAt: "2026-09-26T09:05:00.000Z", lapses: 2 },
+      火: cloud.vocabularyReview.火,
+    });
+  });
 });

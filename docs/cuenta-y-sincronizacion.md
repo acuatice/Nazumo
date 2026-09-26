@@ -20,6 +20,7 @@ No añadas una `service_role` key a variables `NEXT_PUBLIC_*` ni al navegador. L
 - Una cuenta nueva sube el progreso que ya existía en ese navegador.
 - En un dispositivo con progreso local y remoto, combina unidades desbloqueadas/completadas, personajes, fechas de actividad y sesiones sin duplicar intentos idénticos.
 - Las nuevas acciones de estudio se guardan localmente primero; una sesión autenticada las replica cuando hay conexión.
+- La programación del vocabulario espaciado se incluye en el progreso sincronizado; las palabras más difíciles vuelven antes y las repasadas actualizan la actividad diaria.
 - Una sesión cerrada conserva el progreso local del dispositivo. Los datos remotos pertenecen a la cuenta y se eliminan al borrar dicha cuenta en Supabase.
 - Si hay un error de red, el estudio sigue funcionando localmente y el siguiente cambio vuelve a intentar la sincronización.
 

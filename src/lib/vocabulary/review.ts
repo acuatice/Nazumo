@@ -1,16 +1,10 @@
 import type { VocabularyEntry } from "@/data/vocabulary";
+import type { ProgressState, VocabularyReviewItem } from "@/lib/progress/types";
 
 export const VOCABULARY_ROUND_SIZE = 5;
 const KEY = "nazumo:vocabulary-review";
 const INTERVAL_DAYS = [1, 3, 7, 14, 30] as const;
 const FORGOT_DELAY_MINUTES = 10;
-
-export type VocabularyReviewItem = {
-  box: number;
-  dueAt: string;
-  lastSeenAt: string;
-  lapses: number;
-};
 
 export type VocabularyReviewState = {
   items: Record<string, VocabularyReviewItem>;
@@ -31,7 +25,7 @@ export function readVocabularyReviewState(storage: Pick<Storage, "getItem">): Vo
     const items: Record<string, VocabularyReviewItem> = {};
     for (const [id, item] of Object.entries(value.items)) {
       if (typeof item !== "object" || item === null || !("box" in item) || !("dueAt" in item) || !("lastSeenAt" in item) || !("lapses" in item)) continue;
-      if (typeof item.box !== "number" || !Number.isInteger(item.box) || item.box < 0 || item.box > INTERVAL_DAYS.length - 1 || typeof item.dueAt !== "string" || typeof item.lastSeenAt !== "string" || typeof item.lapses !== "number" || !Number.isInteger(item.lapses) || item.lapses < 0) continue;
+      if (typeof item.box !== "number" || !Number.isInteger(item.box) || item.box < 0 || item.box > INTERVAL_DAYS.length || typeof item.dueAt !== "string" || !Number.isFinite(Date.parse(item.dueAt)) || typeof item.lastSeenAt !== "string" || !Number.isFinite(Date.parse(item.lastSeenAt)) || typeof item.lapses !== "number" || !Number.isInteger(item.lapses) || item.lapses < 0) continue;
       items[id] = { box: item.box, dueAt: item.dueAt, lastSeenAt: item.lastSeenAt, lapses: item.lapses };
     }
     return { items };
@@ -67,9 +61,9 @@ export function rateVocabularyItem(
   now = new Date(),
 ): VocabularyReviewState {
   const previous = state.items[entry.japanese];
-  const box = rating === "remembered" ? Math.min((previous?.box ?? 0) + 1, INTERVAL_DAYS.length - 1) : 0;
+  const box = rating === "remembered" ? Math.min((previous?.box ?? 0) + 1, INTERVAL_DAYS.length) : 0;
   const due = new Date(now);
-  if (rating === "remembered") due.setDate(due.getDate() + INTERVAL_DAYS[Math.max(0, box - 1)]);
+  if (rating === "remembered") due.setUTCDate(due.getUTCDate() + INTERVAL_DAYS[Math.max(0, box - 1)]);
   else due.setMinutes(due.getMinutes() + FORGOT_DELAY_MINUTES);
   return {
     items: {
@@ -90,4 +84,47 @@ export function countDueVocabulary(state: VocabularyReviewState, now = new Date(
 
 export function countKnownVocabulary(state: VocabularyReviewState) {
   return Object.values(state.items).filter((item) => item.box >= 2).length;
+}
+
+export function vocabularyReviewFromProgress(progress: ProgressState): VocabularyReviewState {
+  return { items: progress.vocabularyReview ?? {} };
+}
+
+export function mergeVocabularyReviews(local: VocabularyReviewState, cloud: VocabularyReviewState): VocabularyReviewState {
+  const items: Record<string, VocabularyReviewItem> = {};
+  for (const id of new Set([...Object.keys(local.items), ...Object.keys(cloud.items)])) {
+    const localItem = local.items[id];
+    const cloudItem = cloud.items[id];
+    if (!localItem) items[id] = cloudItem;
+    else if (!cloudItem) items[id] = localItem;
+    else {
+      const latest = localItem.lastSeenAt >= cloudItem.lastSeenAt ? localItem : cloudItem;
+      items[id] = { ...latest, lapses: Math.max(localItem.lapses, cloudItem.lapses) };
+    }
+  }
+  return { items };
+}
+
+export function attachVocabularyReview(progress: ProgressState, review: VocabularyReviewState): ProgressState {
+  return { ...progress, vocabularyReview: review.items };
+}
+
+export function recordVocabularyReviewActivity(
+  progress: ProgressState,
+  review: VocabularyReviewState,
+  now = new Date(),
+): ProgressState {
+  const timestamp = now.toISOString();
+  const day = timestamp.slice(0, 10);
+  return {
+    ...progress,
+    vocabularyReview: review.items,
+    profile: {
+      ...progress.profile,
+      lastActivityAt: timestamp,
+      activityDates: progress.profile.activityDates.includes(day)
+        ? progress.profile.activityDates
+        : [...progress.profile.activityDates, day].sort(),
+    },
+  };
 }

@@ -13,7 +13,13 @@ import {
   writeVocabularyReviewState,
   type VocabularyReviewState,
   type VocabularyRating,
+  attachVocabularyReview,
+  mergeVocabularyReviews,
+  recordVocabularyReviewActivity,
+  vocabularyReviewFromProgress,
 } from "@/lib/vocabulary/review";
+import { loadProgress, replaceProgress } from "@/lib/progress/browser";
+import { PROGRESS_EVENT } from "@/lib/progress/repository";
 
 let memoryValue: string | null = null;
 const memoryStorage = {
@@ -37,11 +43,35 @@ export function VocabularyPage() {
   useEffect(() => {
     const initialize = () => {
       const state = readVocabularyReviewState(getReviewStorage());
-      setReview(state);
-      setRound(selectVocabularyRound(vocabulary, state));
+      const progress = loadProgress();
+      const merged = progress
+        ? mergeVocabularyReviews(state, vocabularyReviewFromProgress(progress))
+        : state;
+      if (progress && JSON.stringify(merged.items) !== JSON.stringify(progress.vocabularyReview ?? {})) {
+        replaceProgress(attachVocabularyReview(progress, merged));
+      }
+      writeVocabularyReviewState(getReviewStorage(), merged);
+      setReview(merged);
+      setRound(selectVocabularyRound(vocabulary, merged));
     };
     const timer = window.setTimeout(initialize, 0);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleProgressChange = () => {
+      const progress = loadProgress();
+      if (!progress?.vocabularyReview) return;
+      const cloudReview = vocabularyReviewFromProgress(progress);
+      setReview((current) => {
+        if (!current) return current;
+        const merged = mergeVocabularyReviews(current, cloudReview);
+        writeVocabularyReviewState(getReviewStorage(), merged);
+        return merged;
+      });
+    };
+    window.addEventListener(PROGRESS_EVENT, handleProgressChange);
+    return () => window.removeEventListener(PROGRESS_EVENT, handleProgressChange);
   }, []);
 
   if (!review) return <div className="flex min-h-64 items-center justify-center text-sm text-[var(--muted)]">Preparando vocabulario…</div>;
@@ -64,6 +94,8 @@ export function VocabularyPage() {
     if (!item) return;
     const next = rateVocabularyItem(currentReview, item, rating);
     writeVocabularyReviewState(getReviewStorage(), next);
+    const progress = loadProgress();
+    if (progress) replaceProgress(recordVocabularyReviewActivity(progress, next));
     setReview(next);
     if (rating === "remembered") setRemembered((count) => count + 1);
     setRevealed(false);

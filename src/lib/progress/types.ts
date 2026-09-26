@@ -5,6 +5,7 @@ export interface CharacterProgress { status: CharacterLearningStatus; recognitio
 export interface UnitProgress { unlocked: boolean; completed: boolean; bestAccuracy: number; completedAt: string | null; }
 export interface UnitAttempt { unitId: number; completedAt: string; recognitionCorrect: number; typingCorrect: number; totalQuestions: number; accuracy: number; passed: boolean; }
 export interface ProgressProfile { createdAt: string; lastActivityAt: string | null; lastActiveUnitId: number; activityDates: string[]; lastSavedAt: string; }
-export interface ProgressState { schemaVersion: typeof PROGRESS_SCHEMA_VERSION; profile: ProgressProfile; characters: Record<string, CharacterProgress>; units: Record<string, UnitProgress>; sessions: UnitAttempt[]; }
+export interface VocabularyReviewItem { box: number; dueAt: string; lastSeenAt: string; lapses: number; }
+export interface ProgressState { schemaVersion: typeof PROGRESS_SCHEMA_VERSION; profile: ProgressProfile; characters: Record<string, CharacterProgress>; units: Record<string, UnitProgress>; sessions: UnitAttempt[]; vocabularyReview?: Record<string, VocabularyReviewItem>; }
 export interface LearningSnapshot { introducedIds: string[]; learnedIds: string[]; reviewIds: string[]; completedUnitIds: number[]; currentUnitId: number; recentAccuracy: number | null; streak: number; sessionCount: number; }
 export interface StorageAdapter { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void; }
