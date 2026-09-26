@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { Icon } from "@/components/ui/icon";
 import { vocabulary, type VocabularyEntry } from "@/data/vocabulary";
 import {
   countDueVocabulary,
@@ -39,6 +40,7 @@ export function VocabularyPage() {
   const [revealed, setRevealed] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [remembered, setRemembered] = useState(0);
+  const [speechStatus, setSpeechStatus] = useState("");
 
   useEffect(() => {
     const initialize = () => {
@@ -103,6 +105,21 @@ export function VocabularyPage() {
     else setIndex((current) => current + 1);
   }
 
+  function speakJapanese(text: string) {
+    if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+      setSpeechStatus("Este navegador no tiene voz japonesa disponible.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "ja-JP";
+    utterance.rate = 0.82;
+    utterance.onstart = () => setSpeechStatus("Pronunciación japonesa en curso.");
+    utterance.onend = () => setSpeechStatus("");
+    utterance.onerror = () => setSpeechStatus("No se pudo reproducir la voz japonesa en este dispositivo.");
+    window.speechSynthesis.speak(utterance);
+  }
+
   return <div className="mx-auto max-w-4xl pb-12 pt-4 sm:pt-9 animate-page-in">
     <Link href="/" className="text-sm font-semibold text-[var(--nazumo-purple)]">← Inicio</Link>
     <header className="mt-5"><p className="text-xs font-bold uppercase tracking-[.14em] text-[var(--nazumo-purple)]">Vocabulario en contexto</p><h1 className="mt-2 text-4xl font-extrabold tracking-[-.06em] sm:text-6xl">Palabras para llevar.</h1><p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--muted)]">Repasa cinco palabras por tanda. Intenta recordar el significado y marca con sinceridad cuáles quieres volver a ver.</p></header>
@@ -119,6 +136,8 @@ export function VocabularyPage() {
       <div key={item.japanese} className="animate-question-in p-5 sm:p-8">
         <p lang="ja" className="font-japanese text-6xl font-bold tracking-wide sm:text-8xl">{item.japanese}</p>
         <p className="mt-3 text-base font-semibold text-[var(--nazumo-purple)]">{item.reading}</p>
+        <button type="button" onClick={() => speakJapanese(item.japanese)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--nazumo-purple)]/20 bg-white px-4 text-sm font-bold text-[var(--nazumo-purple)] transition hover:bg-[var(--nazumo-lavender)]/30 active:scale-[.98]" aria-label={`Escuchar pronunciación japonesa de ${item.japanese}`}><Icon name="volume" className="size-4" />Escuchar japonés</button>
+        <span className="sr-only" aria-live="polite">{speechStatus}</span>
         {revealed ? <div className="mt-6 rounded-2xl bg-[var(--nazumo-cream)] p-4 animate-feedback-in sm:p-5"><p className="text-xl font-extrabold">{item.meaning}</p><p lang="ja" className="font-japanese mt-4 text-2xl font-bold">{item.example}</p><p className="mt-1 text-sm text-[var(--nazumo-purple)]">{item.exampleReading}</p><p className="mt-2 text-sm text-[var(--muted)]">{item.exampleMeaning}</p></div> : <div className="mt-6 flex min-h-20 items-center justify-center rounded-2xl border border-dashed border-[var(--border)] px-5 text-center text-sm text-[var(--muted)]">¿Qué significa? Piensa un momento antes de revelar.</div>}
         {!revealed ? <button type="button" onClick={() => setRevealed(true)} className="mt-5 min-h-12 w-full rounded-full bg-[var(--nazumo-purple)] px-6 text-sm font-bold text-white transition active:scale-[.99]">Revelar significado</button> : <div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={() => rate("forgot")} className="min-h-12 rounded-full border border-[var(--border)] bg-white px-3 text-sm font-bold text-[var(--sumi)] transition active:scale-[.99]">Me costó</button><button type="button" onClick={() => rate("remembered")} className="min-h-12 rounded-full bg-[var(--nazumo-purple)] px-3 text-sm font-bold text-white transition active:scale-[.99]">La recordaba</button></div>}
       </div>

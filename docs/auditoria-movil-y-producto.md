@@ -9,7 +9,7 @@
 - La interfaz ya se comporta como una app móvil: navegación inferior fija con Inicio, Aprender, Práctica y Progreso; áreas seguras para iOS; tarjetas táctiles; PWA instalable y transiciones entre rutas.
 - El recorrido principal de hiragana ofrece una ruta progresiva de reconocimiento, escritura y práctica. La guía de inicio explica el primer paso y se puede omitir.
 - Inicio muestra el avance y un acceso a continuar. El vocabulario estaba separado de esa ruta; ahora Inicio prioriza los repasos vencidos y dirige a `/vocabulario`.
-- Vocabulario incluye 12 palabras en contexto, tandas de cinco, revelado de traducción y ejemplo, autoevaluación y un calendario local de repasos.
+- Vocabulario incluye 12 palabras en contexto, tandas de cinco, revelado de traducción y ejemplo, autoevaluación y repasos espaciados. En la tarjeta ahora se puede escuchar la palabra con la voz japonesa disponible en el dispositivo.
 - La página Progreso muestra unidades completadas, caracteres y sesiones. Los repasos de vocabulario cuentan ahora como actividad diaria para la racha.
 - La cuenta real con Supabase ya está activa en producción: `/cuenta` ofrece inicio de sesión, alta, recuperación y confirmación de contraseña; la navegación móvil identifica el acceso como “Cuenta”.
 - El endpoint de progreso en producción devuelve `401 unauthorized` sin una sesión, señal de que no permite acceso anónimo. Falta recorrer alta y confirmación con una cuenta de prueba y verificar la continuidad en un segundo dispositivo.
@@ -34,12 +34,13 @@
 - Revisión visual de Inicio, Vocabulario y Progreso a 390 × 844 px, y confirmación de que Vocabulario y la navegación nueva responden correctamente.
 - Revisión de `/cuenta` y el onboarding a 375 × 812 px; alta, recuperación y acceso visibles en producción; flujo de teclado del diálogo comprobado en local.
 - Enlace de cuenta explícito en navegación móvil y callback compatible con `code` PKCE y `token_hash` de Supabase.
+- Pronunciación japonesa opcional en vocabulario, probada en móvil a 375 × 812 px; la tarjeta conserva la traducción oculta hasta que el alumno la revele.
 
 ## Pendiente para cerrar el objetivo
 
 1. Crear una cuenta de prueba, confirmar el correo, iniciar sesión y probar recuperación de contraseña en producción.
 2. Verificar que el progreso local se fusiona con la cuenta y reaparece al iniciar sesión en otro dispositivo; revisar las políticas RLS después de la primera escritura.
-3. Ampliar la práctica de vocabulario con audio japonés y una modalidad de respuesta escrita; hoy el repaso evalúa recuerdo mediante autoevaluación.
+3. Añadir una modalidad de respuesta escrita al vocabulario; hoy el repaso evalúa recuerdo mediante autoevaluación.
 4. Incorporar una meta diaria configurable y mostrar su avance junto al siguiente paso, manteniendo rachas sin presión excesiva.
 
 ## Referencias de producto

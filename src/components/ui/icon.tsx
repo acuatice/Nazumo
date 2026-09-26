@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export type IconName = "arrow" | "home" | "learn" | "practice" | "progress" | "streak" | "close" | "undo" | "trash" | "check";
+export type IconName = "arrow" | "home" | "learn" | "practice" | "progress" | "streak" | "close" | "undo" | "trash" | "check" | "volume";
 
 export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
   const paths = {
@@ -14,6 +14,7 @@ export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconN
     undo: <><path d="m9 7-5 5 5 5"/><path d="M20 17a7 7 0 0 0-7-7H4"/></>,
     trash: <><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="m6 7 1 14h10l1-14"/></>,
     check: <path d="m5 12 4 4L19 6"/>,
+    volume: <><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></>,
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]}</svg>;
 }
